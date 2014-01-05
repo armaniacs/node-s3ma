@@ -1,0 +1,11 @@
+{
+    "accessKeyId": "AKIA******",
+    "secretAccessKey": "**********",
+    "region": "us-west-2",
+    "bucket": "*******-oregon",
+    "topPrefix": "backup/",
+    "bucketSync": "**********-ireland",
+    "topPrefixSync": "backup/",
+    "endpointSync": "https://s3-eu-west-1.amazonaws.com"
+}
+
