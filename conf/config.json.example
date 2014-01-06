@@ -1,4 +1,5 @@
 {
+    "watchDir": "/tmp",        
     "accessKeyId": "AKIA******",
     "secretAccessKey": "**********",
     "region": "us-west-2",

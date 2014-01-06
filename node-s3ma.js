@@ -15,12 +15,12 @@ mime.load('./conf/config_mime.types');
 
 var s3sync = new AWS.S3({endpoint: config.endpointSync});
 
-
 if (cluster.isMaster) {
     for (var i = 0; i < numCPUs; i++) {
 	worker = cluster.fork();
 
-	watch('.', function(filename) {
+	watch(config.watchDir, function(filename) {
+	    console.log(filename);
 	    worker.send({chat: filename+' is changed.', watchfile: filename});  
 	});
     }
@@ -47,9 +47,16 @@ function uploadingFile(filename) {
 
 
 function uploading(filename, something) {
+    var filepath;
+    if (config.watchDir.indexOf("/") == 0)
+	filepath = filename.replace(config.watchDir, "");
+    else
+	filepath = filename;
+    filepath = filepath.replace(/^\//, "");
+
     var params = {
 	Bucket: config.bucket,
-	Key: config.topPrefix + filename,
+        Key: config.topPrefix + filepath,
 	Body: something,
 	ContentType: mime.lookup(filename)
     };
@@ -61,7 +68,7 @@ function uploading(filename, something) {
 	   }
 	else {
 	    console.log("Successfully uploaded data to " + config.bucket+'/'+params.Key+ ". ETag is " + data.ETag);
-	    syncfile(filename);
+	    syncfile(filepath);
 	}
     });
 };

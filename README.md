@@ -25,6 +25,7 @@ Please use config.json and config_mime.types under "conf" directory.
 
 ```
 {
+    "watchDir": "/tmp",
     "accessKeyId": "AKIA******",
     "secretAccessKey": "**********",
     "region": "us-west-2",
