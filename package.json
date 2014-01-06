@@ -1,0 +1,32 @@
+{
+  "name": "node-s3ma",
+  "version": "0.0.1",
+    "engines": "0.10.24",
+  "description": "Automatic local file backup to two of S3 buckets.",
+  "main": "node-s3ma.js",
+  "scripts": {
+      "test": "echo \\\"Error: no test specified\\\" && exit 1",
+      "start": "node node-s3ma.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/armaniacs/node-s3ma.git"
+  },
+  "keywords": [
+    "AWS",
+    "S3",
+    "node-watch",
+    "backup"
+  ],
+  "author": "ARAKI Yasuhiro",
+  "license": "Apache License Version 2.0",
+  "bugs": {
+    "url": "https://github.com/armaniacs/node-s3ma/issues"
+  },
+    "homepage": "https://github.com/armaniacs/node-s3ma",
+    "dependencies": {
+	"node-watch": "~0.3.4",
+	"aws-sdk": "~2.0.0-rc5",
+	"mime": "~1.2.11"
+    }
+}

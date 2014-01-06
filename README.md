@@ -14,14 +14,14 @@ Setup
 ## Install
 
 ```
-npm install cluster node-watch aws-sdk os mime fs
+npm install node-watch aws-sdk mime 
 ```
 
 ## Config
 
-Please use config.json and config_mime.types.
+Please use config.json and config_mime.types under "conf" directory.
 
-### config.json
+### conf/config.json
 
 ```
 {
@@ -48,7 +48,7 @@ Please use config.json and config_mime.types.
 * "topPrefixSync": Bucket key prefix of the 2nd sync.
 * "endpointSync": Bucket endpoint URL of the 2nd sync.
 
-### config_mime.types
+### conf/config_mime.types
 
 ```
 application/x-test  test

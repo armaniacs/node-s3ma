@@ -7,11 +7,11 @@ var fs = require('fs');
 
 var numReqs = 0;
 var worker;
-var config = require('./config.json');
+var config = require('./conf/config.json');
 
-AWS.config.loadFromPath('./config.json');
+AWS.config.loadFromPath('./conf/config.json');
 var s3 = new AWS.S3();
-mime.load('./config_mime.types');
+mime.load('./conf/config_mime.types');
 
 var s3sync = new AWS.S3({endpoint: config.endpointSync});
 
