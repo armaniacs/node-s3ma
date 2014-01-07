@@ -4,6 +4,7 @@ var AWS = require('aws-sdk');
 var numCPUs = require('os').cpus().length;
 var mime = require('mime');
 var fs = require('fs');
+var path = require('path');
 
 var numReqs = 0;
 var worker;
@@ -20,8 +21,12 @@ if (cluster.isMaster) {
 	worker = cluster.fork();
 
 	watch(config.watchDir, function(filename) {
-	    console.log(filename);
-	    worker.send({chat: filename+' is changed.', watchfile: filename});  
+
+	    if (path.basename(filename).charAt(0) == ".") {
+		console.log("SKIP hidden file: " + filename);
+	    } else {
+		worker.send({chat: filename+' is changed.', watchfile: filename});
+	    }
 	});
     }
 } else {

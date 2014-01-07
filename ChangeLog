@@ -1,0 +1,4 @@
+2014-01-07  ARAKI Yasuhiro  <ar@debian.org>
+
+	* node-s3ma.js: Change to skip hidden file. File name of hidden file is begin with period.
+
