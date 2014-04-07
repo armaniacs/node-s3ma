@@ -5,12 +5,13 @@ var numCPUs = require('os').cpus().length;
 var mime = require('mime');
 var fs = require('fs');
 var path = require('path');
+var moment = require('moment');
 
 var numReqs = 0;
 var worker;
-var config = require('./conf/config.json');
-
-AWS.config.loadFromPath('./conf/config.json');
+var confFile = process.argv[2] || './conf/config.json';
+var config = require(confFile);
+AWS.config.loadFromPath(confFile);
 var s3 = new AWS.S3();
 mime.load('./conf/config_mime.types');
 
@@ -32,26 +33,36 @@ if (cluster.isMaster) {
 } else {
     process.on('message', function(msg) {
 	if (msg.watchfile) {
-	    uploadingFile(msg.watchfile);
+	    mtimeFile(msg.watchfile);
 	};
     });
 }
 
+function mtimeFile(filename) {
+    fs.stat(filename, function(err, stats) {
+	if (err) {console.log(err)}
+	else {
+	    uploadingFile(filename, stats.mtime);
+	}
+    })
+}
 
-function uploadingFile(filename) {
+function uploadingFile(filename, mtime) {
     fs.readFile(filename, function(err, data) {
 	if (err) {console.log(err)}
 	else {	    
 	    if (data.length == 0)
 		console.log("No upload. Because filesize = "+ data.length);
 	    else
-		uploading(filename, data);
+	    {
+		uploading(filename, mtime, data);
+	    }
 	}
     })
 };
 
 
-function uploading(filename, something) {
+function uploading(filename, mtime, data) {
     var filepath;
     if (config.watchDir.indexOf("/") == 0)
 	filepath = filename.replace(config.watchDir, "");
@@ -59,12 +70,33 @@ function uploading(filename, something) {
 	filepath = filename;
     filepath = filepath.replace(/^\//, "");
 
-    var params = {
-	Bucket: config.bucket,
-        Key: config.topPrefix + filepath,
-	Body: something,
-	ContentType: mime.lookup(filename)
+    var momentMtime = moment.utc(mtime);
+    //  Last-Modified: Sun, 06 Apr 2014 22:53:47 GMT
+    var metadataMtime = momentMtime.format("ddd, DD MMM YYYY HH:mm:ss [GMT]");
+
+    if (config.mtimeToMetaData){
+	var params = {
+		Bucket: config.bucket,
+		Key: config.topPrefix + filepath,
+		Body: data,
+		ContentType: mime.lookup(filename),
+		Metadata: {
+		    mtime: metadataMtime
+		},
+		StorageClass: config.storageClass
+	};
+	}
+    else
+    {
+	var params = {
+	    Bucket: config.bucket,
+	    Key: config.topPrefix + filepath,
+	    Body: data,
+	    ContentType: mime.lookup(filename),
+	    StorageClass: config.storageClass
+	}
     };
+	
 
     s3.putObject(params, function(err, data) {
 	if (err){

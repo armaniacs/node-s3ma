@@ -7,6 +7,8 @@
     "topPrefix": "backup/",
     "bucketSync": "**********-ireland",
     "topPrefixSync": "backup/",
-    "endpointSync": "https://s3-eu-west-1.amazonaws.com"
+    "endpointSync": "https://s3-eu-west-1.amazonaws.com",
+    "storageClass": "REDUCED_REDUNDANCY",
+    "mtimeToMetaData": true
 }
 
