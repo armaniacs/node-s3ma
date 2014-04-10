@@ -13,8 +13,12 @@ var confFile = process.argv[2] || './conf/config.json';
 var config = require(confFile);
 AWS.config.loadFromPath(confFile);
 var s3 = new AWS.S3();
-mime.load('./conf/config_mime.types');
-
+// mime.load('./conf/config_mime.types');
+if (config.mimeConfig) {
+    mime.load(config.mimeConfig);
+} else {
+    mime.load('./conf/config_mime.types');
+};
 var s3sync = new AWS.S3({endpoint: config.endpointSync});
 
 if (cluster.isMaster) {
