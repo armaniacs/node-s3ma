@@ -14,7 +14,7 @@ Setup
 ## Install
 
 ```
-npm install node-watch aws-sdk mime 
+npm install node-watch aws-sdk mime moment
 ```
 
 ## Config
