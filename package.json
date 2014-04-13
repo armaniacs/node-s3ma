@@ -1,6 +1,6 @@
 {
   "name": "node-s3ma",
-  "version": "0.0.5",
+  "version": "0.0.6",
     "engines": "0.10.24",
   "description": "Automatic local file backup to two of S3 buckets.",
   "main": "node-s3ma.js",
@@ -27,6 +27,8 @@
     "dependencies": {
 	"node-watch": "~0.3.4",
 	"aws-sdk": "~2.0.0-rc5",
-	"mime": "~1.2.11"
+	"mime": "~1.2.11",
+	"ain2",
+	"moment"
     }
 }
