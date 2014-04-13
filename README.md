@@ -74,6 +74,9 @@ format
 * 4xx error
 ** 400 error
 ** 401 s3.putObject filename
+** 402 mtimeFile(filename)
+** 403 uploadFile()
+** 404 s3sync.copyObject()
 
 
 
