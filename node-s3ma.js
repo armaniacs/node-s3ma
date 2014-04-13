@@ -13,12 +13,14 @@ var confFile = process.argv[2] || './conf/config.json';
 var config = require(confFile);
 AWS.config.loadFromPath(confFile);
 var s3 = new AWS.S3();
-// mime.load('./conf/config_mime.types');
+
 if (config.mimeConfig) {
     mime.load(config.mimeConfig);
 } else {
     mime.load('./conf/config_mime.types');
 };
+
+
 var s3sync = new AWS.S3({endpoint: config.endpointSync});
 
 if (cluster.isMaster) {
@@ -44,7 +46,9 @@ if (cluster.isMaster) {
 
 function mtimeFile(filename) {
     fs.stat(filename, function(err, stats) {
-	if (err) {console.log(err)}
+	if (err) {
+	    console.log(err);
+	}
 	else {
 	    uploadingFile(filename, stats.mtime);
 	}
@@ -53,7 +57,20 @@ function mtimeFile(filename) {
 
 function uploadingFile(filename, mtime) {
     fs.readFile(filename, function(err, data) {
-	if (err) {console.log(err)}
+	if (err) {
+	    if (err.errno == 28){
+		console.log("DIR: "+filename)
+		getDirFiles(filename, function(err, files){
+		    // foreach XXX
+		    files.forEach(function(v){
+			console.log(v);
+			mtimeFile(v);
+		    })
+		})
+	    } else {
+		console.log(err);
+	    }
+	}
 	else {	    
 	    if (data.length == 0)
 		console.log("No upload. Because filesize = "+ data.length);
@@ -130,3 +147,39 @@ function syncfile(filename){
     });
     
 };
+
+function getDirFiles(path, callback){
+    // the callback gets ( err, files) where files is an array of file names
+    if( typeof callback !== 'function' ) return
+    var
+    result = []
+    , files = [ path.replace( /\/\s*$/, '' ) ]
+    function traverseFiles (){
+	if( files.length ) {
+	    var name = files.shift()
+	    fs.stat(name, function( err, stats){
+		if( err ){
+		    if( err.errno == 34 ) traverseFiles()
+		    // in case there's broken symbolic links or a bad path
+		    // skip file instead of sending error
+		    else callback(err)
+		}
+		else if ( stats.isDirectory() ) fs.readdir( name, function( err, files2 ){
+		    if( err ) callback(err)
+		    else {
+			files = files2
+			    .map( function( file ){ return name + '/' + file } )
+			    .concat( files )
+			traverseFiles()
+		    }
+		})
+		else{
+		    result.push(name)
+		    traverseFiles()
+		}
+	    })
+	}
+	else callback( null, result )
+    }
+    traverseFiles()
+}
