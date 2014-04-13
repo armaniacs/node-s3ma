@@ -6,6 +6,8 @@ var mime = require('mime');
 var fs = require('fs');
 var path = require('path');
 var moment = require('moment');
+var SysLogger = require('ain2');
+var console = new SysLogger({tag: 'node-s3ma', facility: 'daemon'});
 
 var numReqs = 0;
 var worker;
@@ -30,7 +32,7 @@ if (cluster.isMaster) {
 	watch(config.watchDir, function(filename) {
 
 	    if (path.basename(filename).charAt(0) == ".") {
-		console.log("SKIP hidden file: " + filename);
+		console.info("101\tSKIP hidden file: " + filename);
 	    } else {
 		worker.send({chat: filename+' is changed.', watchfile: filename});
 	    }
@@ -47,7 +49,7 @@ if (cluster.isMaster) {
 function mtimeFile(filename) {
     fs.stat(filename, function(err, stats) {
 	if (err) {
-	    console.log(err);
+	    console.error("400\t"+err);
 	}
 	else {
 	    uploadingFile(filename, stats.mtime);
@@ -59,21 +61,20 @@ function uploadingFile(filename, mtime) {
     fs.readFile(filename, function(err, data) {
 	if (err) {
 	    if (err.errno == 28){
-		console.log("DIR: "+filename)
+		console.info("102\tDIR\t"+filename)
 		getDirFiles(filename, function(err, files){
 		    // foreach XXX
 		    files.forEach(function(v){
-			console.log(v);
 			mtimeFile(v);
 		    })
 		})
 	    } else {
-		console.log(err);
+		console.error("400\t"+err);
 	    }
 	}
 	else {	    
 	    if (data.length == 0)
-		console.log("No upload. Because filesize = "+ data.length);
+		console.info("103\tZeroByteFile\t"+ filename);
 	    else
 	    {
 		uploading(filename, mtime, data);
@@ -121,11 +122,10 @@ function uploading(filename, mtime, data) {
 
     s3.putObject(params, function(err, data) {
 	if (err){
-            console.log("**** " + filename + " ****");
-	    console.log(err);
+            console.error("401\ts3.putObject\t" + filename + "\t" + err);
 	   }
 	else {
-	    console.log("Successfully uploaded data to " + config.bucket+'/'+params.Key+ ". ETag is " + data.ETag);
+	    console.log("201\tUPLOADED\t" + config.bucket+'/'+params.Key+ "\tETag\t" + data.ETag);
 	    syncfile(filepath);
 	}
     });
@@ -140,9 +140,9 @@ function syncfile(filename){
 
     s3sync.copyObject(params, function(err,data){
 	if (err)
-            console.log(err)
+	    console.error("400\t"+err)
 	else {
-	    console.log("Successfully synced from " + decodeURIComponent(params.CopySource) + " to " + params.Bucket + "/" + params.Key + ". LastModified is " + data.LastModified);
+	    console.log("202\tSYNCED\t" + decodeURIComponent(params.CopySource) + "\tTO\t" + params.Bucket + "/" + params.Key + "\tLastModified\t" + data.LastModified);
 	}
     });
     

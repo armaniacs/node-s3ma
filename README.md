@@ -10,7 +10,7 @@ Your local PC directry (A) -> AWS S3 bucket (B) -> AWS S3 bucket (C)
 3. node-s3ma syncs uploaded file from (B) bucket to (C) bucket.
 
 Setup
----------------
+==============
 ## Install
 
 ```
@@ -57,8 +57,28 @@ application/x-test  test
 
 It is come from https://npmjs.org/package/mime.
 
-Use
+Log
+==============
+
+Genereted logs are sent by syslogd with ain2 (https://www.npmjs.org/package/ain2).
+
+format
 ---------
+
+* 1xx information
+** 101 SKIP hidden file: .hidden
+** 102 DIR filename
+* 2xx success
+** 201 UPLOADEDED bucket/filename ETag 1234567890123456
+** 202 SYNCED hoge TO fuga LastModified 2014-04-12T23:52:23.000Z
+* 4xx error
+** 400 error
+** 401 s3.putObject filename
+
+
+
+Use
+=====
 
 ```
 cd /home/account/target
@@ -66,7 +86,7 @@ node node-s3ma.js
 ```
 
 TODO
----------
+=======
 
 * Daemonize with forever (https://github.com/nodejitsu/forever).
 * Multipart S3 uplord for large file.
