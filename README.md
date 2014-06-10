@@ -92,7 +92,7 @@ TODO
 =======
 
 * Daemonize with forever (https://github.com/nodejitsu/forever).
-* Multipart S3 uplord for large file.
+* Multipart S3 upload for large file.
 
 
 
