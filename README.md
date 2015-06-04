@@ -3,7 +3,7 @@ node-s3-multisync-auto (node-s3ma)
 
 Automatic local file backup to two of S3 buckets.
 
-Your local PC directry (A) -> AWS S3 bucket (B) -> AWS S3 bucket (C)
+Your local PC directory (A) -> AWS S3 bucket (B) -> AWS S3 bucket (C)
 
 1. node-s3-multisync-auto (node-s3ma) detects file modification under running directory (A).
 2. node-s3ma uploads modified file form (A) to the AWS S3 bucket (B).
